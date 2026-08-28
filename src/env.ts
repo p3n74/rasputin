@@ -21,18 +21,12 @@ const schema = z.object({
   WINNOW_UPSTREAM: z.string().url(),
   WINNOW_UI_TOKEN: z.string().min(1),
   PREVIEW_PORTS: z.string().optional().default(""),
-  SEED_OPERATOR_EMAIL: z.string().email().optional().or(z.literal("")),
-  SEED_OPERATOR_PASSWORD: z.string().optional(),
-  SEED_OPERATOR_NAME: z.string().default("Operator"),
 });
 
 export type Env = z.infer<typeof schema> & {
   allowedEmails: Set<string>;
   previewPorts: number[];
   googleEnabled: boolean;
-  seedOperator:
-    | { email: string; password: string; name: string }
-    | undefined;
 };
 
 function parseEmailList(raw: string): Set<string> {
@@ -67,9 +61,6 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     WINNOW_UPSTREAM: source.WINNOW_UPSTREAM,
     WINNOW_UI_TOKEN: source.WINNOW_UI_TOKEN,
     PREVIEW_PORTS: source.PREVIEW_PORTS,
-    SEED_OPERATOR_EMAIL: source.SEED_OPERATOR_EMAIL || undefined,
-    SEED_OPERATOR_PASSWORD: source.SEED_OPERATOR_PASSWORD,
-    SEED_OPERATOR_NAME: source.SEED_OPERATOR_NAME,
   });
 
   const allowedEmails = parseEmailList(parsed.RASPUTIN_ALLOWED_EMAILS);
@@ -90,25 +81,10 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     }
   }
 
-  const seedEmail = parsed.SEED_OPERATOR_EMAIL?.trim().toLowerCase();
-  const seedPassword = parsed.SEED_OPERATOR_PASSWORD;
-  let seedOperator: Env["seedOperator"];
-  if (seedEmail && seedPassword) {
-    if (seedPassword.length < 12) {
-      throw new Error("SEED_OPERATOR_PASSWORD must be at least 12 characters");
-    }
-    seedOperator = {
-      email: seedEmail,
-      password: seedPassword,
-      name: parsed.SEED_OPERATOR_NAME,
-    };
-  }
-
   return {
     ...parsed,
     allowedEmails,
     previewPorts: parsePorts(parsed.PREVIEW_PORTS),
     googleEnabled,
-    seedOperator,
   };
 }

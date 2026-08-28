@@ -1,8 +1,7 @@
 import { config } from "dotenv";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { createAuth, createLockoutStore } from "./auth/index.js";
-import { seedOperator } from "./auth/seed.js";
+import { createAuth } from "./auth/index.js";
 import { createDatabase } from "./db/index.js";
 import { applyMigrations } from "./db/migrate.js";
 import { loadEnv } from "./env.js";
@@ -36,9 +35,8 @@ async function main() {
   const log = createLogger();
   const { db } = createDatabase(env.DATABASE_URL);
   await applyMigrations(db);
-  await seedOperator(db, env, log);
 
-  const auth = createAuth(env, db, createLockoutStore());
+  const auth = createAuth(env, db);
   const upstream = parseUpstream(env.WINNOW_UPSTREAM);
   const webDist = join(projectRoot, "web", "dist");
   const webRoot = join(projectRoot, "web");

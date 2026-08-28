@@ -103,4 +103,78 @@ describe("streaming proxy", () => {
     seen += decoder.decode(rest.value);
     expect(seen).toContain("data: two");
   });
+
+  it("injects the cockpit overlay into HTML pages", async () => {
+    const origin = http.createServer((_req, res) => {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end("<html><body><main>ide</main></body></html>");
+    });
+    const originPort = await listen(origin);
+
+    const gateway = http.createServer((req, res) => {
+      proxyHttp({
+        req,
+        res,
+        upstream: parseUpstream(`http://127.0.0.1:${originPort}`),
+        token: "t",
+        log,
+        requestId: "html",
+        wantsHtml: true,
+      });
+    });
+    const gatewayPort = await listen(gateway);
+
+    const response = await fetch(`http://127.0.0.1:${gatewayPort}/`);
+    const body = await response.text();
+    expect(response.status).toBe(200);
+    expect(body).toContain("ide");
+    expect(body).toContain("data-rasputin-overlay");
+    expect(body).toContain("/_rasputin/");
+  });
+
+  it("replaces upstream 502 HTML with an explicit Winnow-down page", async () => {
+    const origin = http.createServer((_req, res) => {
+      res.writeHead(502, { "content-type": "text/html" });
+      res.end("<html><body>host error</body></html>");
+    });
+    const originPort = await listen(origin);
+
+    const gateway = http.createServer((req, res) => {
+      proxyHttp({
+        req,
+        res,
+        upstream: parseUpstream(`http://127.0.0.1:${originPort}`),
+        token: "t",
+        log,
+        requestId: "down",
+        wantsHtml: true,
+      });
+    });
+    const gatewayPort = await listen(gateway);
+
+    const response = await fetch(`http://127.0.0.1:${gatewayPort}/`);
+    const body = await response.text();
+    expect(response.status).toBe(503);
+    expect(body).toContain("Winnow is down.");
+    expect(body).not.toContain("host error");
+  });
+
+  it("returns a Winnow-down page when the origin is unreachable", async () => {
+    const gateway = http.createServer((req, res) => {
+      proxyHttp({
+        req,
+        res,
+        upstream: parseUpstream("http://127.0.0.1:9"),
+        token: "t",
+        log,
+        requestId: "dead",
+        wantsHtml: true,
+      });
+    });
+    const gatewayPort = await listen(gateway);
+
+    const response = await fetch(`http://127.0.0.1:${gatewayPort}/`);
+    expect(response.status).toBe(503);
+    expect(await response.text()).toContain("Winnow is down.");
+  });
 });

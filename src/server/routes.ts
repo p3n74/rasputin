@@ -1,3 +1,12 @@
+export function isRasputinSpaPath(pathname: string): boolean {
+  return (
+    pathname === "/login" ||
+    pathname === "/_rasputin" ||
+    pathname === "/_rasputin/" ||
+    pathname === "/_rasputin/status"
+  );
+}
+
 export function isRasputinPath(pathname: string): boolean {
   return (
     pathname === "/healthz" ||
