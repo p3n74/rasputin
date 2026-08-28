@@ -43,7 +43,7 @@ export function createApp(deps: AppDeps) {
   app.get("/_rasputin/api/config", (c) =>
     c.json({
       googleEnabled: env.googleEnabled,
-      passwordEnabled: true,
+      passwordEnabled: false,
     }),
   );
 
@@ -79,16 +79,53 @@ export function createApp(deps: AppDeps) {
   });
 
   app.get("/login", async (c) => {
+    const session = await getAllowedSession(
+      auth,
+      c.req.raw.headers,
+      env.allowedEmails,
+    );
+    if (session) {
+      return c.redirect("/_rasputin/");
+    }
+    const html = await readFile(join(webDist, "index.html"), "utf8");
+    return c.html(html);
+  });
+
+  app.get("/_rasputin/", async (c) => {
+    const session = await getAllowedSession(
+      auth,
+      c.req.raw.headers,
+      env.allowedEmails,
+    );
+    if (!session) {
+      return c.redirect("/login");
+    }
     const html = await readFile(join(webDist, "index.html"), "utf8");
     return c.html(html);
   });
 
   app.get("/_rasputin", async (c) => {
+    const session = await getAllowedSession(
+      auth,
+      c.req.raw.headers,
+      env.allowedEmails,
+    );
+    if (!session) {
+      return c.redirect("/login");
+    }
     const html = await readFile(join(webDist, "index.html"), "utf8");
     return c.html(html);
   });
 
   app.get("/_rasputin/status", async (c) => {
+    const session = await getAllowedSession(
+      auth,
+      c.req.raw.headers,
+      env.allowedEmails,
+    );
+    if (!session) {
+      return c.redirect("/login");
+    }
     const html = await readFile(join(webDist, "index.html"), "utf8");
     return c.html(html);
   });

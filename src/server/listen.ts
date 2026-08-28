@@ -9,7 +9,7 @@ import type { Logger } from "../logger.js";
 import { proxyHttp } from "../proxy/http.js";
 import { proxyWebSocket, rejectUpgrade } from "../proxy/ws.js";
 import type { ResolvedUpstream } from "../proxy/upstream.js";
-import { isRasputinPath, isViteDevPath, requestPathname, wantsHtml } from "./routes.js";
+import { isRasputinPath, isRasputinSpaPath, isViteDevPath, requestPathname, wantsHtml } from "./routes.js";
 import type { Hono } from "hono";
 import type { AppBindings } from "./app.js";
 
@@ -19,6 +19,7 @@ const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
   ".svg": "image/svg+xml",
   ".json": "application/json; charset=utf-8",
+  ".woff": "font/woff",
   ".woff2": "font/woff2",
   ".map": "application/json",
 };
@@ -88,11 +89,32 @@ export async function listen(deps: ListenDeps) {
     const pathname = requestPathname(req.url);
 
     try {
-      if (dev && vite && (pathname === "/login" || isViteDevPath(pathname))) {
-        if (pathname === "/login") {
+      if (dev && vite && (isRasputinSpaPath(pathname) || isViteDevPath(pathname))) {
+        if (isRasputinSpaPath(pathname)) {
+          if (pathname !== "/login") {
+            const session = await getAllowedSession(
+              auth,
+              headersFromIncoming(req),
+              env.allowedEmails,
+            );
+            if (!session) {
+              redirect(res, "/login");
+              return;
+            }
+          } else {
+            const session = await getAllowedSession(
+              auth,
+              headersFromIncoming(req),
+              env.allowedEmails,
+            );
+            if (session) {
+              redirect(res, "/_rasputin/");
+              return;
+            }
+          }
           const { readFile } = await import("node:fs/promises");
           const html = await readFile(join(deps.webRoot, "index.html"), "utf8");
-          const transformed = await vite.transformIndexHtml("/login", html);
+          const transformed = await vite.transformIndexHtml(pathname, html);
           res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
           res.end(transformed);
           return;
@@ -104,7 +126,7 @@ export async function listen(deps: ListenDeps) {
       }
 
       if (pathname.startsWith("/_rasputin/assets/")) {
-        const relative = pathname.replace(/^\/_rasputin/, "");
+        const relative = pathname.slice("/_rasputin/".length);
         const filePath = normalize(join(webDist, relative));
         if (filePath.startsWith(normalize(webDist)) && serveFile(res, filePath)) {
           return;
@@ -138,6 +160,7 @@ export async function listen(deps: ListenDeps) {
         token: env.WINNOW_UI_TOKEN,
         log,
         requestId: id,
+        wantsHtml: wantsHtml(req.headers.accept) || pathname === "/",
       });
     } catch (error) {
       log.error({ err: error, requestId: id }, "request handler failed");

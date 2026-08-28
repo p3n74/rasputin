@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isRasputinPath, isViteDevPath } from "../src/server/routes.ts";
+import { isRasputinPath, isRasputinSpaPath, isViteDevPath } from "../src/server/routes.ts";
 
 describe("rasputin routes", () => {
   it("keeps auth, health, and UI off the Winnow proxy", () => {
@@ -10,6 +10,12 @@ describe("rasputin routes", () => {
     expect(isRasputinPath("/")).toBe(false);
     expect(isRasputinPath("/ws/main/1")).toBe(false);
     expect(isRasputinPath("/api/health")).toBe(false);
+  });
+
+  it("treats login and cockpit as SPA shells", () => {
+    expect(isRasputinSpaPath("/login")).toBe(true);
+    expect(isRasputinSpaPath("/_rasputin/")).toBe(true);
+    expect(isRasputinSpaPath("/")).toBe(false);
   });
 
   it("recognizes Vite internals in development", () => {

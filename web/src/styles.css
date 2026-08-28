@@ -1,15 +1,15 @@
-:root {
-  color-scheme: dark;
-  --bg: #0c0d0b;
-  --ink: #ece8dc;
-  --muted: #9a9486;
-  --line: #2c2d27;
-  --accent: #c45c26;
-  --panel: #141510;
-}
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
+@import "@fontsource/geist-sans/600.css";
+@import "tailwindcss";
 
-* {
-  box-sizing: border-box;
+@theme {
+  --font-display: "Clash Display", sans-serif;
+  --font-sans: "Geist Sans", "Clash Display", sans-serif;
+  --ease-lux: cubic-bezier(0.32, 0.72, 0, 1);
+  --color-void: #050505;
+  --color-signal: #5eeab4;
+  --color-ice: #e8fff6;
 }
 
 html,
@@ -17,130 +17,54 @@ body,
 #root {
   min-height: 100%;
   margin: 0;
+  background: #050505;
+  color: #e8fff6;
 }
 
 body {
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--ink);
+  font-family: var(--font-sans);
 }
 
-.shell {
-  max-width: 28rem;
-  margin: 0 auto;
-  padding: 18vh 1.5rem 4rem;
+.font-display {
+  font-family: var(--font-display), sans-serif;
 }
 
-.kicker {
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  color: var(--accent);
-  margin: 0 0 0.75rem;
+.ease-lux {
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-h1 {
-  font-family: "IBM Plex Serif", Palatino, serif;
-  font-weight: 500;
-  font-size: 2.6rem;
-  margin: 0 0 0.75rem;
+@keyframes rasputin-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4rem);
+    filter: blur(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
-.lede,
-.hint {
-  color: var(--muted);
-  line-height: 1.5;
+.rise {
+  animation: rasputin-rise 0.9s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
-button,
-.google {
-  appearance: none;
-  border: 0;
-  cursor: pointer;
-  font: inherit;
+.rise-2 {
+  animation-delay: 80ms;
+}
+.rise-3 {
+  animation-delay: 140ms;
+}
+.rise-4 {
+  animation-delay: 200ms;
 }
 
-.google,
-form button {
-  width: 100%;
-  margin-top: 1.25rem;
-  padding: 0.85rem 1rem;
-  background: var(--ink);
-  color: var(--bg);
-  font-weight: 600;
-}
-
-.google:disabled,
-form button:disabled {
-  opacity: 0.6;
-}
-
-.fallback {
-  margin-top: 1.75rem;
-  border-top: 1px solid var(--line);
-  padding-top: 1rem;
-}
-
-.fallback summary {
-  color: var(--muted);
-  cursor: pointer;
-}
-
-form {
-  display: grid;
-  gap: 0.85rem;
-  margin-top: 1rem;
-}
-
-label {
-  display: grid;
-  gap: 0.35rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-input {
-  font: inherit;
-  color: var(--ink);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  padding: 0.7rem 0.75rem;
-}
-
-.error {
-  color: #e06a4f;
-  margin-top: 1rem;
-}
-
-dl {
-  display: grid;
-  gap: 0.75rem;
-}
-
-dl div {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.5rem;
-}
-
-dt {
-  color: var(--muted);
-}
-
-.row {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-top: 1.5rem;
-}
-
-a {
-  color: var(--ink);
-}
-
-.ghost {
-  background: transparent;
-  color: var(--muted);
-  padding: 0;
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
