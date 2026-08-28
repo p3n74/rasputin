@@ -1,0 +1,146 @@
+:root {
+  color-scheme: dark;
+  --bg: #0c0d0b;
+  --ink: #ece8dc;
+  --muted: #9a9486;
+  --line: #2c2d27;
+  --accent: #c45c26;
+  --panel: #141510;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.shell {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 18vh 1.5rem 4rem;
+}
+
+.kicker {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+}
+
+h1 {
+  font-family: "IBM Plex Serif", Palatino, serif;
+  font-weight: 500;
+  font-size: 2.6rem;
+  margin: 0 0 0.75rem;
+}
+
+.lede,
+.hint {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+button,
+.google {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.google,
+form button {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.google:disabled,
+form button:disabled {
+  opacity: 0.6;
+}
+
+.fallback {
+  margin-top: 1.75rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.fallback summary {
+  color: var(--muted);
+  cursor: pointer;
+}
+
+form {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+input {
+  font: inherit;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 0.7rem 0.75rem;
+}
+
+.error {
+  color: #e06a4f;
+  margin-top: 1rem;
+}
+
+dl {
+  display: grid;
+  gap: 0.75rem;
+}
+
+dl div {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+}
+
+dt {
+  color: var(--muted);
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+a {
+  color: var(--ink);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--muted);
+  padding: 0;
+}
